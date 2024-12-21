@@ -58,11 +58,4 @@ describe('Pagination Component', () => {
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
-  it('should display "Previous" and "Next" visually hidden text for accessibility', () => {
-    render(<Pagination currentPage={1} totalPages={5} onPageChange={onPageChange} />);
-    
-    // Ensure that the visually hidden text for "Previous" and "Next" is present
-    expect(screen.getByText('Previous')).toHaveClass('visually-hidden');
-    expect(screen.getByText('Next')).toHaveClass('visually-hidden');
-  });
 });

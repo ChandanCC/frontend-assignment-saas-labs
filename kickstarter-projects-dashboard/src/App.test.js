@@ -2,16 +2,6 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import App from './App';
 
 describe('App Component', () => {
-  // it('should render loading state initially', async () => {
-  //   render(<App />);
-    
-  //   // Check if loading indicator is visible
-  //   expect(screen.getByRole('status')).toHaveTextContent('Loading...');
-    
-  //   // Ensure that no project data is displayed initially
-  //   expect(screen.queryByText(/S\.No/i)).not.toBeInTheDocument();
-  // });
-
   it('should display project data after loading', async () => {
     render(<App />);
     

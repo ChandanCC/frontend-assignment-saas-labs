@@ -79,16 +79,4 @@ describe('ProjectTable Component', () => {
     // Check if "N/A" is displayed when a value is missing
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
-
-  it('should apply column header sorting functionality (if implemented)', () => {
-    // If sorting is implemented, we can simulate the sorting logic
-    render(<ProjectTable data={data} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" />);
-    
-    // Simulate column click to sort (adjust based on your actual implementation)
-    fireEvent.click(screen.getByText('S.No.'));
-    
-    // Verify if the table data is sorted based on column
-    // This test assumes some sort of sorting logic, adjust accordingly
-  });
-
 });
