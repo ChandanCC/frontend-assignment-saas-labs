@@ -5,40 +5,41 @@ describe('App Component', () => {
   it('should display project data after loading', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
 
-    // Check if project table headers are rendered
     expect(screen.getByText(/S\.No/i)).toBeInTheDocument();
-    expect(screen.getByText(/Percentage funded/i)).toBeInTheDocument();
-    expect(screen.getByText(/Amount pledged/i)).toBeInTheDocument();
+    expect(screen.getByText(/Percentage Funded/i)).toBeInTheDocument(); 
+    expect(screen.getByText(/Amount Pledged/i)).toBeInTheDocument();
 
-    // Check if the first project data is rendered
-    const firstProjectRow = screen.getByText(/186/i);
+    const firstProjectRow = screen.getByText(/^0$/i);
     expect(firstProjectRow).toBeInTheDocument();
   });
 
   it('should render pagination with correct number of pages', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
 
-    // Check if pagination is present
     expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
 
-    // Check if pagination info is correct
-    expect(screen.getByText(/Page 1 of 21/i)).toBeInTheDocument();
+    const firstPageButton = screen.getByLabelText('Go to page 1');
+    expect(firstPageButton).toHaveClass('pagination-page-button-active');
+
+    expect(firstPageButton).toBeInTheDocument();
+    expect(screen.getByLabelText('Go to page 2')).toBeInTheDocument();
+    expect(screen.getByLabelText('Go to page 3')).toBeInTheDocument();
+    expect(screen.getByLabelText('Go to page 4')).toBeInTheDocument();
+    expect(screen.getByLabelText('Go to page 5')).toBeInTheDocument();
+    expect(screen.getByLabelText('Go to page 21')).toBeInTheDocument();
   });
 
   it('should change the page correctly when next button is clicked', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
@@ -46,18 +47,16 @@ describe('App Component', () => {
     const nextButton = screen.getByTestId('next-btn');
     fireEvent.click(nextButton);
 
-    // Check if page info updates
-    expect(screen.getByText(/Page 2 of 21/i)).toBeInTheDocument();
+    const secondPageButton = screen.getByLabelText('Go to page 2');
+    expect(secondPageButton).toHaveClass('pagination-page-button-active');
 
-    // Check if new set of projects is displayed
-    expect(screen.queryByTitle(/^0$/i)).not.toBeInTheDocument();
-    expect(screen.getByTitle(/^5$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^0$/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '5' })).toBeInTheDocument();
   });
 
   it('should change the page correctly when previous button is clicked', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
@@ -68,40 +67,34 @@ describe('App Component', () => {
     const prevButton = screen.getByTestId('prev-btn');
     fireEvent.click(prevButton);
 
-    // Check if page info updates
-    expect(screen.getByText(/Page 1 of 21/i)).toBeInTheDocument();
+    const firstPageButton = screen.getByLabelText('Go to page 1');
+    expect(firstPageButton).toHaveClass('pagination-page-button-active');
 
-    // Check if the first set of projects is displayed again
-    expect(screen.getByText(/186/i)).toBeInTheDocument();
+    expect(screen.getByText(/^0$/i)).toBeInTheDocument();
   });
 
   it('should disable previous button on the first page', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
 
-    const prevButton = screen.getByLabelText('Previous page');
+    const prevButton = screen.getByTestId('prev-btn');
     expect(prevButton).toBeDisabled();
   });
 
   it('should disable next button on the last page', async () => {
     render(<App />);
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText(/Loading\.\.\./i)).not.toBeInTheDocument();
     });
 
-    // Navigate to last page
-    const nextButton = screen.getByLabelText('Next page');
-    for (let i = 0; i < 20; i++) {
-      fireEvent.click(nextButton);
-    }
+    const lastPageButton = screen.getByLabelText('Go to page 21');
+    fireEvent.click(lastPageButton);
 
-    const lastPageNextButton = screen.getByLabelText('Next page');
-    expect(lastPageNextButton).toBeDisabled();
+    const nextButton = screen.getByTestId('next-btn');
+    expect(nextButton).toBeDisabled();
   });
 });

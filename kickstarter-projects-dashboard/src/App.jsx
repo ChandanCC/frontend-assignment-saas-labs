@@ -7,14 +7,17 @@ const columns = [
   {
     title: "S.No",
     key: "s.no",
+    sorter: true,
   },
   {
     title: "Percentage funded",
-    key: "percentage.funded",
+    key: "percentage.funded", 
+    sorter: true,
   },
   {
     title: "Amount pledged",
     key: "amt.pledged",
+    sorter: true,
   },
 ];
 
@@ -22,6 +25,7 @@ const App = () => {
   const [projects, setProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: "s.no", direction: "asc" });
   const recordsPerPage = 5;
 
   useEffect(() => {
@@ -41,6 +45,22 @@ const App = () => {
     fetchProjects();
   }, []);
 
+  const sortedProjects = React.useMemo(() => {
+    let sortableProjects = [...projects];
+    if (sortConfig !== null) {
+      sortableProjects.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableProjects;
+  }, [projects, sortConfig]);
+
   const totalPages = Math.ceil(projects.length / recordsPerPage);
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -48,7 +68,14 @@ const App = () => {
     }
   };
 
-  const currentProjects = projects.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
+  const handleTableDataChange = (key, direction) => {
+    setSortConfig({ key, direction });
+  };
+
+  const currentProjects = sortedProjects.slice(
+    (currentPage - 1) * recordsPerPage,
+    currentPage * recordsPerPage
+  );
 
   return (
     <section className="app-container">
@@ -60,6 +87,8 @@ const App = () => {
         columns={columns}
         hideCaption
         caption={"Kickstarter Project Details"}
+        onTableDataChange={handleTableDataChange}
+        sortConfig={sortConfig}
       />
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
     </section>

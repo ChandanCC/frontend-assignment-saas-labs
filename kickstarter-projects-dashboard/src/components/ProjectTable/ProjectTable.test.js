@@ -2,11 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ProjectTable from './ProjectTable';
 
 describe('ProjectTable Component', () => {
+  const mockOnTableDataChange = jest.fn();
   
   const columns = [
-    { key: 'id', title: 'S.No.' },
-    { key: 'percentage', title: 'Percentage Funded' },
-    { key: 'pledged', title: 'Amount Pledged' },
+    { key: 'id', title: 'S.No.', sorter: true },
+    { key: 'percentage', title: 'Percentage Funded', sorter: true },
+    { key: 'pledged', title: 'Amount Pledged', sorter: true },
   ];
 
   const data = [
@@ -16,67 +17,79 @@ describe('ProjectTable Component', () => {
 
   const loadingData = [];
 
+  const defaultProps = {
+    data,
+    loading: false,
+    caption: "Project Details",
+    columns,
+    rowKeyPath: "id",
+    onTableDataChange: mockOnTableDataChange,
+    sortConfig: { key: null, direction: null }
+  };
+
+  beforeEach(() => {
+    mockOnTableDataChange.mockClear();
+  });
+
   it('should render table with provided data', () => {
-    render(<ProjectTable data={data} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" />);
-    
-    // Verify that table headers are rendered
+    render(<ProjectTable {...defaultProps} />);
+
     columns.forEach((column) => {
       expect(screen.getByText(column.title)).toBeInTheDocument();
     });
 
-    // Verify that table rows are rendered with data
     data.forEach((project) => {
-      expect(screen.getByText(project.id)).toBeInTheDocument();
-      expect(screen.getByText(project.percentage)).toBeInTheDocument();
-      expect(screen.getByText(project.pledged)).toBeInTheDocument();
+      expect(screen.getByText(project.id.toString())).toBeInTheDocument();
+      expect(screen.getByText(project.percentage.toString())).toBeInTheDocument();
+      expect(screen.getByText(project.pledged.toString())).toBeInTheDocument();
     });
   });
 
   it('should display loading state when loading is true', () => {
-    render(<ProjectTable data={loadingData} loading={true} caption="Project Details" columns={columns} rowKeyPath="id" />);
+    render(<ProjectTable {...defaultProps} loading={true} data={loadingData} />);
     
-    // Check if loading spinner and text are rendered
     expect(screen.getByRole('status')).toHaveTextContent('Loading...');
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it('should display "No projects to display" when data is empty', () => {
-    render(<ProjectTable data={loadingData} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" />);
+    render(<ProjectTable {...defaultProps} data={loadingData} />);
     
-    // Check if the "No projects to display" message appears
     expect(screen.getByRole('status')).toHaveTextContent('No projects to display.');
   });
 
   it('should hide caption when hideCaption prop is true', () => {
-    render(<ProjectTable data={data} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" hideCaption={true} />);
+    render(<ProjectTable {...defaultProps} hideCaption={true} />);
     
-    // Ensure caption is visually hidden
     const caption = screen.getByText('Project Details');
     expect(caption).toHaveClass('visually-hidden');
   });
 
   it('should show caption when hideCaption prop is false', () => {
-    render(<ProjectTable data={data} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" hideCaption={false} />);
+    render(<ProjectTable {...defaultProps} hideCaption={false} />);
     
-    // Ensure caption is visible
     const caption = screen.getByText('Project Details');
     expect(caption).not.toHaveClass('visually-hidden');
   });
 
-  it('should not break when no data is passed', () => {
-    render(<ProjectTable data={[]} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" />);
+  it('should display sort icons correctly', () => {
+    render(<ProjectTable {...defaultProps} sortConfig={{ key: 'percentage', direction: 'asc' }} />);
     
-    // Ensure that "No projects to display" message appears when data is empty
-    expect(screen.getByText('No projects to display.')).toBeInTheDocument();
+    expect(screen.getByRole('sort-ascending')).toBeInTheDocument();
+
+    render(<ProjectTable {...defaultProps} sortConfig={{ key: 'percentage', direction: 'desc' }} />);
+    
+    expect(screen.getByRole('sort-descending')).toBeInTheDocument();
   });
 
   it('should correctly handle title for empty or undefined fields', () => {
     const incompleteData = [
       { id: 1, percentage: 50 },
     ];
-    render(<ProjectTable data={incompleteData} loading={false} caption="Project Details" columns={columns} rowKeyPath="id" />);
+    render(<ProjectTable {...defaultProps} data={incompleteData} />);
     
-    // Check if "N/A" is displayed when a value is missing
-    expect(screen.getByText('N/A')).toBeInTheDocument();
+    const naElements = screen.getAllByText('N/A');
+    expect(naElements).toHaveLength(1);
+    expect(naElements[0]).toBeInTheDocument();
   });
 });
