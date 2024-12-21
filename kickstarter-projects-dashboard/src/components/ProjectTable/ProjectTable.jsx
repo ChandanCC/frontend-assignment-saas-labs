@@ -16,25 +16,28 @@ const ProjectTable = ({ data, loading, hideCaption, caption, columns, rowKeyPath
         </tr>
       </thead>
       <tbody className={`project-table-body`}>
-        <tr className={`project-table-loading ${loading && "visible"}`}>
-          <RiRefreshLine size={40} />
-          <span>Loading...</span>
-        </tr>
-        {data.length > 0 ? (
-          data.map((project) => {
-            return (
-              <tr key={project[rowKeyPath]}>
-                {columns.map((column) => (
-                  <td key={`${project[rowKeyPath]}_${column.key}`} title={project[column.key] ?? "N/A"}>
-                    {project[column.key] ?? "N/A"}
-                  </td>
-                ))}
-              </tr>
-            );
-          })
+        {loading ? (
+          <tr>
+            <td colSpan={columns.length} className="no-data">
+              <div className="project-table-loading">
+                <RiRefreshLine size={40} data-testid="loading-spinner"/>
+                <span role="status">Loading...</span>
+              </div>
+            </td>
+          </tr>
+        ) : data.length > 0 ? (
+          data.map((project) => (
+            <tr key={project[rowKeyPath]}>
+              {columns.map((column) => (
+                <td key={`${project[rowKeyPath]}_${column.key}`} title={project[column.key] ?? "N/A"}>
+                  {project[column.key] ?? "N/A"}
+                </td>
+              ))}
+            </tr>
+          ))
         ) : (
           <tr>
-            <td colSpan={columns.length ?? 3} className="no-data">
+            <td colSpan={columns.length} className="no-data" role="status">
               No projects to display.
             </td>
           </tr>

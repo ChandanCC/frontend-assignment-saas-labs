@@ -10,18 +10,20 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
         aria-label="Previous page"
+        data-testid="prev-btn"
       >
         <RiArrowDropLeftLine size={32}/>
         <span className="visually-hidden">Previous</span>
       </button>
-      <span className="pagination-info" role="status" aria-live="polite">
-        Page {currentPage} of {totalPages}
+      <span className="pagination-info" role="contentinfo" aria-live="polite">
+        {`Page ${currentPage} of ${totalPages}`}
       </span>
       <button
         className="pagination-button"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
         aria-label="Next page"
+        data-testid="next-btn"
       >
         <RiArrowDropRightLine size={32}/>
         <span className="visually-hidden">Next</span>

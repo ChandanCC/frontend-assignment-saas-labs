@@ -21,12 +21,11 @@ const columns = [
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const recordsPerPage = 5;
 
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true);
       try {
         const response = await fetch(
           "https://raw.githubusercontent.com/saaslabsco/frontend-assignment/refs/heads/master/frontend-assignment.json"
